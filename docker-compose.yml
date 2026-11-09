@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: revyze-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: revyze
+      POSTGRES_USER: revyze
+      POSTGRES_PASSWORD: revyzepassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - revyze_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U revyze -d revyze"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  revyze_pgdata:
+
