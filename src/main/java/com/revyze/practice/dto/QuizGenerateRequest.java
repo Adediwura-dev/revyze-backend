@@ -45,3 +45,4 @@ public class QuizGenerateRequest {
         this.questionCount = questionCount;
     }
 }
+

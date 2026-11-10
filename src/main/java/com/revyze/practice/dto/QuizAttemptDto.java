@@ -95,3 +95,4 @@ public class QuizAttemptDto {
         this.completedAt = completedAt;
     }
 }
+

@@ -83,3 +83,4 @@ public class QuizResultDto {
         this.results = results;
     }
 }
+

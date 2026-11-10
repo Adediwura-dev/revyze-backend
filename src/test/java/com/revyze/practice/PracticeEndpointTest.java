@@ -94,3 +94,4 @@ class PracticeEndpointTest {
                 .andExpect(jsonPath("$.data").isArray());
     }
 }
+

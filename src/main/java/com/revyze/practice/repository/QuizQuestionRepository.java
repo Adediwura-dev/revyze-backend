@@ -11,3 +11,4 @@ import java.util.UUID;
 public interface QuizQuestionRepository extends JpaRepository<QuizQuestion, UUID> {
     List<QuizQuestion> findByQuizIdOrderByQuestionIndexAsc(UUID quizId);
 }
+

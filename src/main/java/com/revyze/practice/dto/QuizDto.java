@@ -74,3 +74,4 @@ public class QuizDto {
         this.createdAt = createdAt;
     }
 }
+
