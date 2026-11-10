@@ -1,5 +1,6 @@
 package com.revyze.material.service;
 
+import com.revyze.activity.service.ActivityService;
 import com.revyze.material.dto.StudyMaterialDto;
 import com.revyze.material.entity.StudyMaterial;
 import com.revyze.material.repository.StudyMaterialRepository;
@@ -18,11 +19,15 @@ public class StudyMaterialService {
 
     private final StudyMaterialRepository materialRepository;
     private final FileStorageService fileStorageService;
+    private final ActivityService activityService;
 
     @Autowired
-    public StudyMaterialService(StudyMaterialRepository materialRepository, FileStorageService fileStorageService) {
+    public StudyMaterialService(StudyMaterialRepository materialRepository,
+                                FileStorageService fileStorageService,
+                                ActivityService activityService) {
         this.materialRepository = materialRepository;
         this.fileStorageService = fileStorageService;
+        this.activityService = activityService;
     }
 
     @Transactional
@@ -42,6 +47,14 @@ public class StudyMaterialService {
         );
 
         StudyMaterial saved = materialRepository.save(material);
+
+        activityService.logActivity(
+                userId,
+                "MATERIAL_UPLOAD",
+                "Uploaded " + originalFilename,
+                "Added new study material to study space"
+        );
+
         return StudyMaterialDto.fromEntity(saved);
     }
 
