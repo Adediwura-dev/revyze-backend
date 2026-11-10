@@ -12,3 +12,4 @@ public interface ExamRepository extends JpaRepository<Exam, UUID> {
     List<Exam> findByUserIdOrderByExamDateAsc(UUID userId);
     List<Exam> findByCourseId(UUID courseId);
 }
+

@@ -12,3 +12,4 @@ public interface TopicRepository extends JpaRepository<Topic, UUID> {
     List<Topic> findByCourseId(UUID courseId);
     List<Topic> findByCourseIdIn(List<UUID> courseIds);
 }
+

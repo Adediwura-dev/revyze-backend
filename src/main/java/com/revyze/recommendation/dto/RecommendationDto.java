@@ -157,3 +157,4 @@ public class RecommendationDto {
         this.description = description;
     }
 }
+

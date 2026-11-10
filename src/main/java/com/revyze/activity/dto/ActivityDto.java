@@ -73,3 +73,4 @@ public class ActivityDto {
         this.createdAt = createdAt;
     }
 }
+

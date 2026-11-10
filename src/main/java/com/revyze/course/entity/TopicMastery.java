@@ -88,3 +88,4 @@ public class TopicMastery {
         return updatedAt;
     }
 }
+

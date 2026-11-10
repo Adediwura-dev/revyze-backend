@@ -12,3 +12,4 @@ import java.util.UUID;
 public interface RecentActivityRepository extends JpaRepository<RecentActivity, UUID> {
     List<RecentActivity> findByUserIdOrderByCreatedAtDesc(UUID userId, Pageable pageable);
 }
+

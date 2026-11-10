@@ -13,3 +13,4 @@ public interface TopicMasteryRepository extends JpaRepository<TopicMastery, UUID
     Optional<TopicMastery> findByUserIdAndTopicId(UUID userId, UUID topicId);
     List<TopicMastery> findByUserId(UUID userId);
 }
+

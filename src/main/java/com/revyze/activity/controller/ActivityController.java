@@ -43,3 +43,4 @@ public class ActivityController {
         return ResponseEntity.ok(ApiResponse.ok(dto));
     }
 }
+

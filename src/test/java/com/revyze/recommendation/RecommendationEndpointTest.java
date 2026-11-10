@@ -69,3 +69,4 @@ class RecommendationEndpointTest {
                 .andExpect(jsonPath("$.data").isArray());
     }
 }
+
