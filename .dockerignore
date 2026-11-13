@@ -1,0 +1,13 @@
+target/
+.git/
+.gitignore
+.env
+.env.*
+uploads/
+*.md
+.DS_Store
+.idea/
+.vscode/
+*.iml
+test_apis.sh
+

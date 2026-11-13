@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: revyze-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: SPRING_DATASOURCE_URL
+        sync: false # Set to: jdbc:postgresql://<host>:<port>/postgres?sslmode=require
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false # e.g. postgres (or postgres.<project-ref>)
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false # Your Supabase database password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MS
+        value: 86400000
+      - key: APP_CORS_ALLOWED_ORIGINS
+        value: "http://localhost:5173,http://localhost:3000"
+
+
