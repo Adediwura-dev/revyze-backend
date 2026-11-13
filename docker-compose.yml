@@ -4,11 +4,11 @@ services:
     container_name: revyze-postgres
     restart: always
     environment:
-      POSTGRES_DB: revyze
-      POSTGRES_USER: revyze
-      POSTGRES_PASSWORD: revyzepassword
+      POSTGRES_DB: ${POSTGRES_DB:-revyze}
+      POSTGRES_USER: ${POSTGRES_USER:-revyze}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-revyzepassword}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - revyze_pgdata:/var/lib/postgresql/data
     healthcheck:
