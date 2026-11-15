@@ -1,10 +1,12 @@
 package com.revyze.practice.dto;
 
 import java.util.List;
+import java.util.UUID;
 
 public class QuizSubmitRequest {
 
     private List<AnswerSubmission> answers;
+    private Integer timeSpentSeconds;
 
     public QuizSubmitRequest() {
     }
@@ -21,8 +23,17 @@ public class QuizSubmitRequest {
         this.answers = answers;
     }
 
+    public Integer getTimeSpentSeconds() {
+        return timeSpentSeconds;
+    }
+
+    public void setTimeSpentSeconds(Integer timeSpentSeconds) {
+        this.timeSpentSeconds = timeSpentSeconds;
+    }
+
     public static class AnswerSubmission {
-        private int questionIndex;
+        private UUID questionId;
+        private Integer questionIndex;
         private String selectedOption; // "A", "B", "C", "D"
 
         public AnswerSubmission() {
@@ -33,11 +44,25 @@ public class QuizSubmitRequest {
             this.selectedOption = selectedOption;
         }
 
-        public int getQuestionIndex() {
+        public AnswerSubmission(UUID questionId, Integer questionIndex, String selectedOption) {
+            this.questionId = questionId;
+            this.questionIndex = questionIndex;
+            this.selectedOption = selectedOption;
+        }
+
+        public UUID getQuestionId() {
+            return questionId;
+        }
+
+        public void setQuestionId(UUID questionId) {
+            this.questionId = questionId;
+        }
+
+        public Integer getQuestionIndex() {
             return questionIndex;
         }
 
-        public void setQuestionIndex(int questionIndex) {
+        public void setQuestionIndex(Integer questionIndex) {
             this.questionIndex = questionIndex;
         }
 

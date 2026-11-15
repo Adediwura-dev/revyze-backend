@@ -94,10 +94,16 @@ public class QuizService {
             throw new IllegalArgumentException("Quiz has no questions");
         }
 
-        Map<Integer, String> userAnswers = new HashMap<>();
+        Map<UUID, String> answersById = new HashMap<>();
+        Map<Integer, String> answersByIndex = new HashMap<>();
         if (request != null && request.getAnswers() != null) {
             for (QuizSubmitRequest.AnswerSubmission sub : request.getAnswers()) {
-                userAnswers.put(sub.getQuestionIndex(), sub.getSelectedOption());
+                if (sub.getQuestionId() != null && sub.getSelectedOption() != null) {
+                    answersById.put(sub.getQuestionId(), sub.getSelectedOption().trim());
+                }
+                if (sub.getQuestionIndex() != null && sub.getSelectedOption() != null) {
+                    answersByIndex.put(sub.getQuestionIndex(), sub.getSelectedOption().trim());
+                }
             }
         }
 
@@ -105,8 +111,12 @@ public class QuizService {
         List<QuestionResultDto> resultList = new ArrayList<>();
 
         for (QuizQuestion q : questions) {
-            String selected = userAnswers.get(q.getQuestionIndex());
-            boolean isCorrect = selected != null && selected.equalsIgnoreCase(q.getCorrectOption());
+            String selected = answersById.get(q.getId());
+            if (selected == null && answersByIndex.containsKey(q.getQuestionIndex())) {
+                selected = answersByIndex.get(q.getQuestionIndex());
+            }
+            boolean isCorrect = selected != null && q.getCorrectOption() != null
+                    && selected.equalsIgnoreCase(q.getCorrectOption().trim());
             if (isCorrect) {
                 score++;
             }

@@ -20,13 +20,16 @@ public class AssistantService {
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ActivityService activityService;
+    private final GeminiService geminiService;
 
     public AssistantService(ChatSessionRepository chatSessionRepository,
                             ChatMessageRepository chatMessageRepository,
-                            ActivityService activityService) {
+                            ActivityService activityService,
+                            GeminiService geminiService) {
         this.chatSessionRepository = chatSessionRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.activityService = activityService;
+        this.geminiService = geminiService;
     }
 
     @Transactional
@@ -40,13 +43,21 @@ public class AssistantService {
             session = chatSessionRepository.save(new ChatSession(userId, title));
         }
 
+        // Fetch past messages for conversation context
+        List<ChatMessage> history = chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(session.getId());
+
         // Save User Message
         ChatMessage userMsg = chatMessageRepository.save(
                 new ChatMessage(session.getId(), "USER", request.getMessage().trim())
         );
 
-        // Generate Academic Assistant Response
-        String responseContent = generateAcademicResponse(request.getMessage().trim());
+        // Generate Academic Assistant Response via Gemini AI (or academic fallback)
+        String responseContent;
+        if (geminiService.isConfigured()) {
+            responseContent = geminiService.generateResponse(history, request.getMessage().trim());
+        } else {
+            responseContent = generateAcademicResponse(request.getMessage().trim());
+        }
 
         // Save Assistant Message
         ChatMessage assistantMsg = chatMessageRepository.save(
