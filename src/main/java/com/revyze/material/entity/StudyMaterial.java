@@ -30,6 +30,9 @@ public class StudyMaterial {
     @Column(nullable = false, length = 50)
     private String status = "READY";
 
+    @Column(nullable = false, length = 30)
+    private String analysisStatus = "PENDING";
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -46,6 +49,7 @@ public class StudyMaterial {
         this.contentType = contentType;
         this.fileSize = fileSize;
         this.status = "READY";
+        this.analysisStatus = "PENDING";
     }
 
     @PrePersist
@@ -114,6 +118,14 @@ public class StudyMaterial {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getAnalysisStatus() {
+    return analysisStatus;
+}
+
+    public void setAnalysisStatus(String analysisStatus) {
+    this.analysisStatus = analysisStatus;
+}
 
     public Instant getCreatedAt() {
         return createdAt;

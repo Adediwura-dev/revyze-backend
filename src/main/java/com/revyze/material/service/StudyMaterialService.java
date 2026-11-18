@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.revyze.material.event.MaterialUploadedEvent;
+import org.springframework.context.ApplicationEventPublisher;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,14 +23,17 @@ public class StudyMaterialService {
     private final StudyMaterialRepository materialRepository;
     private final FileStorageService fileStorageService;
     private final ActivityService activityService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
     public StudyMaterialService(StudyMaterialRepository materialRepository,
                                 FileStorageService fileStorageService,
-                                ActivityService activityService) {
+                                ActivityService activityService,
+                                ApplicationEventPublisher eventPublisher) {
         this.materialRepository = materialRepository;
         this.fileStorageService = fileStorageService;
         this.activityService = activityService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -47,6 +53,7 @@ public class StudyMaterialService {
         );
 
         StudyMaterial saved = materialRepository.save(material);
+        eventPublisher.publishEvent(new MaterialUploadedEvent(saved.getId()));
 
         activityService.logActivity(
                 userId,

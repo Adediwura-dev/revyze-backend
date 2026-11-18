@@ -12,6 +12,7 @@ public class StudyMaterialDto {
     private String contentType;
     private Long fileSize;
     private String status;
+    private String analysisStatus;
     private Instant createdAt;
     private String downloadUrl;
 
@@ -19,12 +20,13 @@ public class StudyMaterialDto {
     }
 
     public StudyMaterialDto(UUID id, String originalFilename, String contentType, Long fileSize,
-                            String status, Instant createdAt, String downloadUrl) {
+                            String status, String analysisStatus, Instant createdAt, String downloadUrl) {
         this.id = id;
         this.originalFilename = originalFilename;
         this.contentType = contentType;
         this.fileSize = fileSize;
         this.status = status;
+        this.analysisStatus = analysisStatus;
         this.createdAt = createdAt;
         this.downloadUrl = downloadUrl;
     }
@@ -37,6 +39,7 @@ public class StudyMaterialDto {
                 entity.getContentType(),
                 entity.getFileSize(),
                 entity.getStatus(),
+                entity.getAnalysisStatus(),
                 entity.getCreatedAt(),
                 downloadUrl
         );
@@ -81,6 +84,14 @@ public class StudyMaterialDto {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getAnalysisStatus() {
+    return analysisStatus;
+}
+
+    public void setAnalysisStatus(String analysisStatus) {
+    this.analysisStatus = analysisStatus;
+}
 
     public Instant getCreatedAt() {
         return createdAt;

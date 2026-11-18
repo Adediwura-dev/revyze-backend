@@ -115,6 +115,144 @@ public class GeminiService {
         }
     }
 
+
+public String generateMaterialAnalysis(String extractedText) {
+
+    if (!isConfigured()) {
+        throw new IllegalStateException(
+                "Gemini API key is not configured."
+        );
+    }
+
+    if (extractedText == null || extractedText.isBlank()) {
+        throw new IllegalArgumentException(
+                "Document text cannot be empty."
+        );
+    }
+
+    String prompt = """
+            Analyse the following university study material.
+
+            Return ONLY valid JSON with exactly these fields:
+
+            {
+              "summary": "A clear summary of the material",
+              "keyConcepts": ["Concept 1", "Concept 2"],
+              "importantPoints": ["Point 1", "Point 2"],
+              "definitions": [
+                {
+                  "term": "Term",
+                  "meaning": "Definition"
+                }
+              ]
+            }
+
+            Instructions:
+            1. Base your analysis strictly on the supplied material.
+            2. Explain concepts clearly for university students.
+            3. Include the most important information.
+            4. Do not invent facts or definitions.
+            5. If a section has no relevant information, return an empty array.
+            6. Do not include Markdown or code fences.
+
+            STUDY MATERIAL:
+
+            """ + extractedText;
+
+    GeminiRequest request = new GeminiRequest(
+            new GeminiRequest.SystemInstruction(
+                    Collections.singletonList(
+                            new GeminiRequest.Part(
+                                    "You are Revyze AI, an academic study material analyst. "
+                                    + "Produce accurate, structured analysis."
+                            )
+                    )
+            ),
+            Collections.singletonList(
+                    new GeminiRequest.Content(
+                            "user",
+                            Collections.singletonList(
+                                    new GeminiRequest.Part(prompt)
+                            )
+                    )
+            )
+    );
+
+    request.setGenerationConfig(
+            new GeminiRequest.GenerationConfig("application/json")
+    );
+
+    try {
+        return callGemini(model, request);
+
+    } catch (Exception ex) {
+        log.error("Gemini material analysis failed with model {}: {}",
+                model, ex.getMessage());
+
+        if (model.equals("gemini-2.5-flash")) {
+            throw new RuntimeException(
+                    "Unable to analyse study material.", ex
+            );
+        }
+
+        try {
+            log.info("Retrying material analysis with gemini-2.5-flash");
+
+            return callGemini("gemini-2.5-flash", request);
+
+        } catch (Exception fallbackEx) {
+            log.error("Material analysis fallback failed: {}",
+                    fallbackEx.getMessage());
+
+            throw new RuntimeException(
+                    "Unable to analyse study material.", fallbackEx
+            );
+        }
+    }
+}
+
+private String callGemini(String modelName, GeminiRequest request) {
+
+    String url = String.format(
+            "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
+            modelName,
+            apiKey
+    );
+
+    GeminiResponse response = restClient.post()
+            .uri(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(request)
+            .retrieve()
+            .body(GeminiResponse.class);
+
+    if (response == null
+            || response.getCandidates() == null
+            || response.getCandidates().isEmpty()) {
+        throw new RuntimeException("Gemini returned an empty response.");
+    }
+
+    StringBuilder result = new StringBuilder();
+
+    GeminiResponse.Candidate candidate = response.getCandidates().get(0);
+
+    if (candidate.getContent() != null
+            && candidate.getContent().getParts() != null) {
+
+        for (GeminiResponse.Part part : candidate.getContent().getParts()) {
+            if (part.getText() != null) {
+                result.append(part.getText());
+            }
+        }
+    }
+
+    if (result.isEmpty()) {
+        throw new RuntimeException("Gemini returned no analysis text.");
+    }
+
+    return result.toString().trim();
+}
+
     private GeminiRequest buildRequestPayload(List<ChatMessage> history, String userMessage) {
         String systemPrompt = "You are Revyze AI, an expert, encouraging university-level academic tutor. "
                 + "Answer the student's exact question accurately and directly. "
@@ -151,6 +289,35 @@ public class GeminiService {
         @JsonProperty("systemInstruction")
         private SystemInstruction systemInstruction;
         private List<Content> contents;
+        private GenerationConfig generationConfig;
+
+        public GenerationConfig getGenerationConfig() {
+    return generationConfig;
+}
+
+    public void setGenerationConfig(GenerationConfig generationConfig) {
+    this.generationConfig = generationConfig;
+}
+
+    public static class GenerationConfig {
+
+    @JsonProperty("responseMimeType")
+    private String responseMimeType;
+
+    public GenerationConfig() {}
+
+    public GenerationConfig(String responseMimeType) {
+        this.responseMimeType = responseMimeType;
+    }
+
+    public String getResponseMimeType() {
+        return responseMimeType;
+    }
+
+    public void setResponseMimeType(String responseMimeType) {
+        this.responseMimeType = responseMimeType;
+    }
+}
 
         public GeminiRequest() {}
 

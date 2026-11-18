@@ -13,6 +13,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.revyze.material.dto.MaterialAnalysisDto;
+import com.revyze.material.service.MaterialAnalysisService;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -21,10 +24,14 @@ import java.util.UUID;
 public class StudyMaterialController {
 
     private final StudyMaterialService studyMaterialService;
+    private final MaterialAnalysisService materialAnalysisService;
 
-    public StudyMaterialController(StudyMaterialService studyMaterialService) {
-        this.studyMaterialService = studyMaterialService;
-    }
+    public StudyMaterialController(
+        StudyMaterialService studyMaterialService,
+        MaterialAnalysisService materialAnalysisService) {
+    this.studyMaterialService = studyMaterialService;
+    this.materialAnalysisService = materialAnalysisService;
+}
 
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<StudyMaterialDto>> upload(
@@ -56,6 +63,17 @@ public class StudyMaterialController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
                 .body(fileResource);
     }
+
+    @GetMapping("/{id}/analysis")
+    public ResponseEntity<ApiResponse<MaterialAnalysisDto>> getAnalysis(
+        @AuthenticationPrincipal UserPrincipal currentUser,
+        @PathVariable("id") UUID id) {
+
+    MaterialAnalysisDto analysis = materialAnalysisService.getMaterialAnalysis(
+            currentUser.getId(), id);
+
+    return ResponseEntity.ok(ApiResponse.ok(analysis));
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> remove(
