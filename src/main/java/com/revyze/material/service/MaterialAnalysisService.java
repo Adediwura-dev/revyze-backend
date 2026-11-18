@@ -53,7 +53,7 @@ public void analyzeMaterialAsync(UUID materialId) {
 
     try {
         // 1. Give analysis status
-        updateAnalysisStatus(material, "PROCESSING");
+        updateAnalysisStatus(materialId, "PROCESSING");
 
         // 2. Load document
         Resource file = fileStorageService.loadAsResource(
@@ -89,10 +89,10 @@ public void analyzeMaterialAsync(UUID materialId) {
         materialAnalysisRepository.save(analysis);
 
         // 8. Mark as completed
-        updateAnalysisStatus(material, "COMPLETED");
+        updateAnalysisStatus(materialId, "COMPLETED");
 
     } catch (Exception e) {
-        updateAnalysisStatus(material, "FAILED");
+        updateAnalysisStatus(materialId, "FAILED");
 
         System.err.println(
                 "Material analysis failed for " + materialId + ": " + e.getMessage()
@@ -100,11 +100,17 @@ public void analyzeMaterialAsync(UUID materialId) {
     }
 }
 
-    // @Transactional
-    protected void updateAnalysisStatus(StudyMaterial material, String status) {
-    material.setAnalysisStatus(status);
-    studyMaterialRepository.save(material);
-}
+    @Transactional
+    public void updateAnalysisStatus(UUID materialId, String status) {
+        try {
+            studyMaterialRepository.findById(materialId).ifPresent(mat -> {
+                mat.setAnalysisStatus(status);
+                studyMaterialRepository.save(mat);
+            });
+        } catch (Exception ex) {
+            System.err.println("Failed to update analysis status to " + status + " for " + materialId + ": " + ex.getMessage());
+        }
+    }
 
 @Transactional(readOnly = true)
 public MaterialAnalysisDto getMaterialAnalysis(UUID userId, UUID materialId) {
