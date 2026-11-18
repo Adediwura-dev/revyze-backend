@@ -3,6 +3,8 @@ package com.revyze.material.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
@@ -19,6 +21,7 @@ public class MaterialAnalysis {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_material_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private StudyMaterial studyMaterial;
 
     @Column(columnDefinition = "TEXT")

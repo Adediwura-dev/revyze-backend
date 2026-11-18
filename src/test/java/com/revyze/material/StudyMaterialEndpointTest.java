@@ -64,6 +64,7 @@ class StudyMaterialEndpointTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.originalFilename").value("lecture_slides.pdf"))
+                .andExpect(jsonPath("$.data.analysisStatus").value("PENDING"))
                 .andReturn();
 
         JsonNode uploadJson = objectMapper.readTree(uploadResult.getResponse().getContentAsString());
@@ -73,7 +74,8 @@ class StudyMaterialEndpointTest {
                         .header("Authorization", "Bearer " + userAuthToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data[0].id").value(materialId));
+                .andExpect(jsonPath("$.data[0].id").value(materialId))
+                .andExpect(jsonPath("$.data[0].analysisStatus").exists());
 
         mockMvc.perform(get("/api/v1/materials/" + materialId + "/download")
                         .header("Authorization", "Bearer " + userAuthToken))

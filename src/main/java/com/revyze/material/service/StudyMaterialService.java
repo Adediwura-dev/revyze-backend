@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.revyze.material.event.MaterialUploadedEvent;
+import com.revyze.material.repository.MaterialAnalysisRepository;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
@@ -21,16 +22,19 @@ import java.util.stream.Collectors;
 public class StudyMaterialService {
 
     private final StudyMaterialRepository materialRepository;
+    private final MaterialAnalysisRepository materialAnalysisRepository;
     private final FileStorageService fileStorageService;
     private final ActivityService activityService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
     public StudyMaterialService(StudyMaterialRepository materialRepository,
+                                MaterialAnalysisRepository materialAnalysisRepository,
                                 FileStorageService fileStorageService,
                                 ActivityService activityService,
                                 ApplicationEventPublisher eventPublisher) {
         this.materialRepository = materialRepository;
+        this.materialAnalysisRepository = materialAnalysisRepository;
         this.fileStorageService = fileStorageService;
         this.activityService = activityService;
         this.eventPublisher = eventPublisher;
@@ -87,6 +91,9 @@ public class StudyMaterialService {
     public void deleteMaterial(UUID userId, UUID materialId) {
         StudyMaterial material = materialRepository.findByIdAndUserId(materialId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Study material not found with ID: " + materialId));
+
+        materialAnalysisRepository.findByStudyMaterialId(material.getId())
+                .ifPresent(materialAnalysisRepository::delete);
 
         fileStorageService.delete(material.getStoredFilename());
         materialRepository.delete(material);

@@ -1,6 +1,7 @@
 package com.revyze.material.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -30,7 +31,8 @@ public class StudyMaterial {
     @Column(nullable = false, length = 50)
     private String status = "READY";
 
-    @Column(nullable = false, length = 30)
+    @Column(name = "analysis_status", length = 30)
+    @ColumnDefault("'PENDING'")
     private String analysisStatus = "PENDING";
 
     @Column(nullable = false, updatable = false)
@@ -56,6 +58,9 @@ public class StudyMaterial {
     protected void onCreate() {
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
+        if (this.analysisStatus == null || this.analysisStatus.isBlank()) {
+            this.analysisStatus = "PENDING";
+        }
     }
 
     @PreUpdate
@@ -120,12 +125,12 @@ public class StudyMaterial {
     }
 
     public String getAnalysisStatus() {
-    return analysisStatus;
-}
+        return (analysisStatus != null && !analysisStatus.isBlank()) ? analysisStatus : "PENDING";
+    }
 
     public void setAnalysisStatus(String analysisStatus) {
-    this.analysisStatus = analysisStatus;
-}
+        this.analysisStatus = (analysisStatus != null && !analysisStatus.isBlank()) ? analysisStatus : "PENDING";
+    }
 
     public Instant getCreatedAt() {
         return createdAt;
